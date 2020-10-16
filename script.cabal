@@ -20,7 +20,7 @@ library
   exposed-modules:     MyLib
   -- other-modules:
   -- other-extensions:
-  build-depends:       base >=4.13 && <4.14
+  build-depends:       base >=4.13 && <4.14, directory
   -- hs-source-dirs:
   default-language:    Haskell2010
 
@@ -28,15 +28,14 @@ executable script
   main-is:             Main.hs
   other-modules:       MyLib
   -- other-extensions:
-  build-depends:       base >=4.13 && <4.14
-                       ,containers
-                       ,directory, regexpr, MissingH
+  build-depends:       base >=4.13 && <4.14, containers, directory, regexpr, MissingH
   -- hs-source-dirs:
   default-language:    Haskell2010
 
 test-suite script-test
   default-language:    Haskell2010
   type:                exitcode-stdio-1.0
+
   -- hs-source-dirs:
   main-is:             MyLibTest.hs
-  build-depends:       base >=4.13 && <4.14, regexpr, hspec, QuickCheck
+  build-depends:       base >=4.13 && <4.14, regexpr, hspec, QuickCheck, directory

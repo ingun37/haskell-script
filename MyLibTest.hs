@@ -16,4 +16,6 @@ main = hspec $ do
       let x = MyLib.onlyGroup 0 $ matchRegexPR "ab(cde)f\\1" "kkkabcdefcdefgh"
       x `shouldBe` Just "cde"
     
-    
+    it "gets all files recursively" $ do
+      x <- MyLib.allFiles "./test-data"
+      x `shouldBe` ["./test-data/a","./test-data/b/c"]
