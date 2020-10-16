@@ -33,3 +33,10 @@ executable script
                        ,directory, regexpr, MissingH
   -- hs-source-dirs:
   default-language:    Haskell2010
+
+test-suite script-test
+  default-language:    Haskell2010
+  type:                exitcode-stdio-1.0
+  -- hs-source-dirs:
+  main-is:             MyLibTest.hs
+  build-depends:       base >=4.13 && <4.14, regexpr, hspec, QuickCheck
