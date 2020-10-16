@@ -16,10 +16,10 @@ _allFiles :: FilePath -> IO [FilePath]
 _allFiles path = doesFileExist path >>= _ifInv (return [path]) (allFiles path)
 
 allFiles :: FilePath -> IO [FilePath]
-allFiles path = listDirectory path >>= _ioJoin . map (_allFiles . ((path ++ "/") ++))
+allFiles path = listDirectory path >>= _flatM . map (_allFiles . ((path ++ "/") ++))
 
-_ioJoin :: [IO[a]] -> IO [a]
-_ioJoin = fmap join . sequence
+_flatM :: Monad m => [ m [a] ] -> m [a]
+_flatM = fmap join . sequence
 
 _ifInv :: a -> a -> Bool -> a
 _ifInv a b c = if c then a else b
