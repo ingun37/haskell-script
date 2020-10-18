@@ -1,4 +1,4 @@
-# Revision history for script
+# Revision history for json-generator
 
 ## 0.1.0.0 -- YYYY-mm-dd
 

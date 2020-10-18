@@ -1,7 +1,10 @@
-module MyLib (onlyMatch, onlyGroups, onlyGroup, allFiles) where
+module Util (onlyMatch, onlyGroups, onlyGroup, allFiles, copyIfExist) where
 
 import System.Directory (listDirectory, doesFileExist)
+import qualified System.Directory as D
 import Control.Monad (join, (>=>))
+import qualified System.FilePath.Posix as P
+
 -- matchRegexPR gmatchRegexPR
 onlyMatch :: Functor m => m ((String, (String, String)), [(Int, String)]) -> m String
 onlyMatch = fmap (fst . fst)
@@ -23,3 +26,11 @@ _flatM = fmap join . sequence
 
 _ifInv :: a -> a -> Bool -> a
 _ifInv a b c = if c then a else b
+
+copyIfExist :: FilePath -> FilePath -> IO ()
+copyIfExist src dstDir =
+    let dst = dstDir P.</> (P.takeFileName src)
+    in D.doesFileExist src >>= \b -> 
+        if b 
+        then D.copyFile src dst 
+        else putStrLn $ src ++ "does not exist"
