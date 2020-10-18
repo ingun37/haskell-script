@@ -91,6 +91,8 @@ exit    = exitWith ExitSuccess
 die     = exitWith (ExitFailure 1)
 
 
+-- change ![](a/b/c.jpg) to ![](assets/{$1}/c.jpg)
+-- copy all the images to assets/$1/
 mdTraverse :: FilePath -> FilePath -> (FilePath, String) -> IO String
 mdTraverse assetsPath relTo (path, content) = do
     let mdDir = P.dropFileName path
