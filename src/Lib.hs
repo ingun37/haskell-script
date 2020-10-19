@@ -2,7 +2,7 @@
 
 module Lib (parse) where
 
-import System.Exit ( exitWith, ExitCode(ExitFailure, ExitSuccess) )
+import System.Exit ( exitWith, ExitCode(ExitSuccess) )
 import Crypto.Hash.SHA1 as SHA ( hash )
 import System.Directory.Tree
     ( readDirectoryWithL, DirTree(Dir, File), filterDir, zipPaths )
