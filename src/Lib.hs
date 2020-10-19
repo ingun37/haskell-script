@@ -6,7 +6,6 @@ import System.Exit ( exitWith, ExitCode(ExitSuccess) )
 import Crypto.Hash.SHA1 as SHA ( hash )
 import System.Directory.Tree
     ( readDirectoryWithL, DirTree(Dir, File), filterDir, zipPaths )
-import qualified Control.Monad as M
 import Data.List.Split ()
 import Data.Map ( fromList, Map )
 import Data.Aeson ( encode, ToJSON )
@@ -19,7 +18,6 @@ import qualified Data.ByteString.Base16 as B16
 import qualified Text.RegexPR as R
 import qualified Util as U
 import qualified System.Directory as D
-import Control.Conditional (ifM)
 import qualified Data.Tree as T
 
 data Item = Item {
@@ -87,5 +85,4 @@ mdTraverse assetsPath relTo (path, content) = do
     mapM_ (D.createDirectoryIfMissing True . (assetsPath </>) . P.dropFileName) matches
     mapM_ (\m -> D.copyFile (mdDir </> m) (assetsPath </> m)) matches
     let rel = P.makeRelative relTo assetsPath
-    putStrLn $ "relpath" ++ rel
     return $ R.gsubRegexPR "!\\[\\]\\((?!http)(.+?)\\)" ("![](assets/"++rel++"/\\1)") content
