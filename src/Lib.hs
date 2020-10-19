@@ -5,22 +5,18 @@ module Lib (parse) where
 import System.Exit ( exitWith, ExitCode(ExitFailure, ExitSuccess) )
 import Crypto.Hash.SHA1 as SHA ( hash )
 import System.Directory.Tree
-    ( readDirectoryWithL, AnchoredDirTree((:/)), DirTree(Dir, File), filterDir )
-import qualified System.Directory.Tree as DT
+    ( readDirectoryWithL, DirTree(Dir, File), filterDir, zipPaths )
 import Control.Monad ( join )
-import qualified Control.Monad as M
 import Data.List.Split ()
 import Data.Map ( fromList, Map )
 import Data.Aeson ( encode, ToJSON )
 import GHC.Generics ( Generic )
 import qualified Data.ByteString.Char8 as B
-import qualified Data.ByteString.Lazy.Char8 as Bz
 import qualified Data.ByteString.Lazy.UTF8 as BzUTF8
 import System.FilePath.Posix (takeFileName, takeBaseName, joinPath, (</>))
 import qualified System.FilePath.Posix as P
 import qualified Data.ByteString.Base16 as B16
 import qualified Text.RegexPR as R
-import qualified System.IO as IO
 import qualified Util as U
 import qualified System.Directory as D
 import Control.Conditional (ifM)
@@ -73,7 +69,7 @@ dirFilter _ = True
 
 parse :: [String] -> IO ()
 parse (src:(dst:[])) = do
-    dirobj <- DT.zipPaths <$> readDirectoryWithL readFile src
+    dirobj <- zipPaths <$> readDirectoryWithL readFile src
     let mdDir = filterDir dirFilter dirobj
     let imgDst = dst </> "imgs"
     let dbDst = dst </> "db"
@@ -88,7 +84,6 @@ parse _     = usage >> exit
 
 usage   = putStrLn "Usage: gen-json src dst"
 exit    = exitWith ExitSuccess
-die     = exitWith (ExitFailure 1)
 
 
 -- change ![](a/b/c.jpg) to ![](assets/{$1}/c.jpg)
