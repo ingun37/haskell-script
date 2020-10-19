@@ -13,7 +13,7 @@ import qualified Data.Aeson as J
 import GHC.Generics ( Generic )
 import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy.UTF8 as BzUTF8
-import System.FilePath.Posix (takeFileName, takeBaseName, joinPath, (</>))
+import System.FilePath.Posix (takeFileName, takeBaseName, (</>))
 import qualified System.FilePath.Posix as P
 import qualified Data.ByteString.Base16 as B16
 import qualified Text.RegexPR as R
