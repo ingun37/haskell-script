@@ -20,6 +20,8 @@ import qualified Text.RegexPR as R
 import qualified Util as U
 import qualified System.Directory as D
 import Control.Conditional (ifM)
+import qualified Data.Tree as T
+
 data Item = Item {
     title :: String,
     sha1 :: String,
@@ -33,24 +35,16 @@ kids :: [Item],
 parentSha1 :: String
 } deriving (Generic, Show)
 
-data Tr = Tr {
-    node :: Node,
-    children :: [Tr]
-    }
-
 sha1InHex = B.unpack . B16.encode . SHA.hash . B.pack
 --it generates tree from bottom-up (dynamic programming)
-makeTr :: String -> String -> [DirTree String] -> Tr
+makeTr :: String -> String -> [DirTree String] -> T.Tree Node
 makeTr path parentSha1 entries =
     let sha1 = sha1InHex path
         kidTrs = [makeTr (path </> title) sha1 entries' | Dir title entries' <- entries]
-        kidItems = Prelude.map (item . node) kidTrs
+        kidItems = Prelude.map (item . T.rootLabel) kidTrs
         thisItem = Item (takeFileName path) sha1 (fromList [(takeBaseName name', file) | File name' file <- entries])
         thisNode = Node path thisItem kidItems parentSha1
-    in Tr thisNode kidTrs
-
-makeNodes :: Tr -> [Node]
-makeNodes (Tr node children) = join (Prelude.map makeNodes children) ++ [node]
+    in T.Node thisNode kidTrs
 
 instance ToJSON Item
 instance ToJSON Node
@@ -79,7 +73,7 @@ parse (src:(dst:[])) = do
     D.createDirectoryIfMissing True dbDst
     mdDir' <- traverse (mdTraverse imgDst dst) mdDir
     let (Dir name entries) = mdDir'
-    writeJson dbDst (makeNodes (makeTr name "" entries))
+    writeJson dbDst (T.flatten (makeTr name "" entries))
 parse _     = usage >> exit
 
 usage   = putStrLn "Usage: gen-json src dst"
