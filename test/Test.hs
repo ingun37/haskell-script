@@ -17,6 +17,7 @@ main = hspec $ do
       removeDirectoryRecursive toPath
       createDirectoryIfMissing True toPath
       parse ["test/data/from", toPath]
+      -- Top directory names are different, hence (_ :/ (Dir _ toDT))
       (_ DT.:/ (DT.Dir _ toDT)) <- DT.readDirectoryWith B.readFile toPath
       (_ DT.:/ (DT.Dir _ beDT)) <- DT.readDirectoryWith B.readFile "test/data/to-be-equal"
       toDT `shouldBe` beDT
