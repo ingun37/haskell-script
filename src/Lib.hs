@@ -6,7 +6,7 @@ import System.Exit ( exitWith, ExitCode(ExitSuccess) )
 import Crypto.Hash.SHA1 as SHA ( hash )
 import System.Directory.Tree
     ( readDirectoryWithL, DirTree(Dir, File), filterDir, zipPaths )
-import Control.Monad ( join )
+import qualified Control.Monad as M
 import Data.List.Split ()
 import Data.Map ( fromList, Map )
 import Data.Aeson ( encode, ToJSON )
@@ -67,10 +67,8 @@ parse (src:(dst:[])) = do
     let mdDir = filterDir dirFilter dirobj
     let imgDst = dst </> "imgs"
     let dbDst = dst </> "db"
-    ifM (D.doesDirectoryExist imgDst) (D.removeDirectoryRecursive imgDst) (return ())
-    ifM (D.doesDirectoryExist dbDst) (D.removeDirectoryRecursive dbDst) (return ())
-    D.createDirectoryIfMissing True imgDst
-    D.createDirectoryIfMissing True dbDst
+    let f = \x -> D.removePathForcibly x >> D.createDirectoryIfMissing True x
+    mapM_ f [imgDst, dbDst]
     mdDir' <- traverse (mdTraverse imgDst dst) mdDir
     let (Dir name entries) = mdDir'
     writeJson dbDst (T.flatten (makeTr name "" entries))
