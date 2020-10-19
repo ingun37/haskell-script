@@ -2,7 +2,6 @@
 
 module Lib (parse) where
 
-import System.Exit ( exitWith, ExitCode(ExitSuccess) )
 import Crypto.Hash.SHA1 as SHA ( hash )
 import System.Directory.Tree
     ( readDirectoryWithL, DirTree(Dir, File), filterDir, zipPaths )
@@ -56,25 +55,19 @@ writeJson' dst = let f = (dst </>) . (P.-<.> ".json") . sha1 . item -- make dest
                  in (uncurry writeFile) . bimap f g . dup           -- dup :: a -> (a,a)
 
 dirFilter :: DirTree a -> Bool
-dirFilter (File name _) = ".md" == (reverse . take 3 . reverse) name
+dirFilter (File name _) = ".md" `P.isExtensionOf` name
 dirFilter _ = True
 
-parse :: [String] -> IO ()
-parse (src:(dst:[])) = do
-    dirobj <- zipPaths <$> readDirectoryWithL readFile src
-    let mdDir = filterDir dirFilter dirobj
+parse :: FilePath -> FilePath -> IO ()
+parse src dst = do
+    mdDir <- (filterDir dirFilter) . zipPaths <$> readDirectoryWithL readFile src
     let imgDst = dst </> "imgs"
     let dbDst = dst </> "db"
-    let f = \x -> D.removePathForcibly x >> D.createDirectoryIfMissing True x
+    let f = \x -> D.removePathForcibly x >> D.createDirectoryIfMissing True x -- clean the directory by removing and then making again
     mapM_ f [imgDst, dbDst]
     mdDir' <- traverse (mdTraverse imgDst dst) mdDir
     let (Dir name entries) = mdDir'
     mapM_ (writeJson' dbDst) (T.flatten (makeTr name "" entries))
-parse _     = usage >> exit
-
-usage   = putStrLn "Usage: gen-json src dst"
-exit    = exitWith ExitSuccess
-
 
 -- change ![](a/b/c.jpg) to ![](assets/{$1}/c.jpg)
 -- copy all the images to assets/$1/
