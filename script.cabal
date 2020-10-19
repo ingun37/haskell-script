@@ -31,7 +31,8 @@ common deps
                  utf8-string,
                  directory,
                  regexpr,
-                 cond
+                 cond,
+                 MissingH
 
 library Util
   import:              deps

@@ -1,6 +1,6 @@
 { mkDerivation, aeson, base, base16-bytestring, bytestring, cond
 , containers, cryptohash-sha1, directory, directory-tree, filepath
-, hspec, QuickCheck, regexpr, split, stdenv, utf8-string
+, hspec, MissingH, QuickCheck, regexpr, split, stdenv, utf8-string
 }:
 mkDerivation {
   pname = "script";
@@ -10,18 +10,18 @@ mkDerivation {
   isExecutable = true;
   libraryHaskellDepends = [
     aeson base base16-bytestring bytestring cond containers
-    cryptohash-sha1 directory directory-tree filepath regexpr split
-    utf8-string
+    cryptohash-sha1 directory directory-tree filepath MissingH regexpr
+    split utf8-string
   ];
   executableHaskellDepends = [
     aeson base base16-bytestring bytestring cond containers
-    cryptohash-sha1 directory directory-tree filepath regexpr split
-    utf8-string
+    cryptohash-sha1 directory directory-tree filepath MissingH regexpr
+    split utf8-string
   ];
   testHaskellDepends = [
     aeson base base16-bytestring bytestring cond containers
-    cryptohash-sha1 directory directory-tree filepath hspec QuickCheck
-    regexpr split utf8-string
+    cryptohash-sha1 directory directory-tree filepath hspec MissingH
+    QuickCheck regexpr split utf8-string
   ];
   doHaddock = false;
   license = "unknown";

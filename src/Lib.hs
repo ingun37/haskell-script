@@ -8,7 +8,8 @@ import System.Directory.Tree
     ( readDirectoryWithL, DirTree(Dir, File), filterDir, zipPaths )
 import Data.List.Split ()
 import Data.Map ( fromList, Map )
-import Data.Aeson ( encode, ToJSON )
+import Data.Aeson ( ToJSON )
+import qualified Data.Aeson as J
 import GHC.Generics ( Generic )
 import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy.UTF8 as BzUTF8
@@ -19,6 +20,8 @@ import qualified Text.RegexPR as R
 import qualified Util as U
 import qualified System.Directory as D
 import qualified Data.Tree as T
+import Data.Tuple.Utils (dup)
+import Data.Bifunctor (bimap)
 
 data Item = Item {
     title :: String,
@@ -47,13 +50,10 @@ makeTr path parentSha1 entries =
 instance ToJSON Item
 instance ToJSON Node
 
-writeJson :: String -> [Node] -> IO ()
-writeJson _ [] = return ()
-writeJson dst (x:xs) = do 
-    let jsonFileName = (sha1 $ item x) ++ ".json"
-        jsonPath = joinPath [dst, jsonFileName]
-    _ <- writeFile jsonPath (BzUTF8.toString (encode x))
-    writeJson dst xs
+writeJson' :: String -> Node -> IO ()
+writeJson' dst = let f = (dst </>) . (P.-<.> ".json") . sha1 . item -- make destination file path from Node
+                     g = BzUTF8.toString . J.encode                 -- make json from Node
+                 in (uncurry writeFile) . bimap f g . dup           -- dup :: a -> (a,a)
 
 dirFilter :: DirTree a -> Bool
 dirFilter (File name _) = ".md" == (reverse . take 3 . reverse) name
@@ -69,7 +69,7 @@ parse (src:(dst:[])) = do
     mapM_ f [imgDst, dbDst]
     mdDir' <- traverse (mdTraverse imgDst dst) mdDir
     let (Dir name entries) = mdDir'
-    writeJson dbDst (T.flatten (makeTr name "" entries))
+    mapM_ (writeJson' dbDst) (T.flatten (makeTr name "" entries))
 parse _     = usage >> exit
 
 usage   = putStrLn "Usage: gen-json src dst"
